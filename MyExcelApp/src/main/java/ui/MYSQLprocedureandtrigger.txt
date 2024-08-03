@@ -1,0 +1,256 @@
+-------frist make in mysql db name excel_import
+-------make table in myql name tghapp
+
+
+
+//procedure
+
+//calculate opening and closing balance procedure 
+
+//CalculatePrincipalBalances 1st 
+
+-- copy this code in db procedure section
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CalculatePrincipalBalances`()
+BEGIN
+DECLARE v_id TEXT DEFAULT 0;
+DECLARE v_sr_no TEXT;
+DECLARE v_opening_balance TEXT;
+DECLARE v_principal_received TEXT;
+DECLARE v_closing_balance TEXT;
+DECLARE prev_id TEXT DEFAULT 0;
+DECLARE done TEXT DEFAULT 0;
+
+-- Declare a cursor for iterating through rows
+DECLARE cur CURSOR FOR
+SELECT id, Sr_No, Loan_Disbursment, Principal_Received
+FROM tghapp
+ORDER BY id, Sr_No;
+
+-- Declare CONTINUE handler for cursor
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+-- Open the cursor
+OPEN cur;
+
+-- Loop through the rows
+read_loop: LOOP
+FETCH cur INTO v_id, v_sr_no, v_opening_balance, v_principal_received;
+
+-- Exit the loop if done
+IF done THEN
+LEAVE read_loop;
+END IF;
+
+-- Check if id has changed and Sr_No is 1
+IF v_id != prev_id AND v_sr_no = 1 THEN
+-- Set Opening_Balance to Loan_Disbursement
+SET v_opening_balance = (SELECT Loan_Disbursment FROM tghapp WHERE id = v_id AND Sr_No = 1);
+ELSE
+-- Use Closing_Balance from the previous row
+SET v_opening_balance = (
+SELECT Closing_Balance_of_Principal_O_S
+FROM tghapp
+WHERE id = prev_id AND Sr_No = (v_sr_no - 1)
+);
+END IF;
+
+-- Calculate Closing_Balance
+SET v_closing_balance = v_opening_balance - v_principal_received;
+
+-- Update the table with the calculated balances
+UPDATE tghapp
+SET Opening_Bal_of_Principal_O_S = v_opening_balance,
+Closing_Balance_of_Principal_O_S = v_closing_balance
+WHERE id = v_id AND Sr_No = v_sr_no;
+
+-- Set the previous ID to the current ID
+SET prev_id = v_id;
+END LOOP;
+
+-- Close the cursor
+CLOSE cur;
+END
+
+-------Principal Recieved----------end copy------
+
+
+-----calculate lendingkart --------capy procedure---
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Calculate_Lendingkart_Share_One_1`()
+BEGIN
+DECLARE v_id TEXT DEFAULT 0;
+DECLARE v_sr_no TEXT;
+DECLARE v_opening_balance TEXT;
+DECLARE v_Lendingkart_Share_One TEXT;
+DECLARE v_closing_balance TEXT;
+DECLARE prev_id TEXT DEFAULT 0;
+DECLARE done TEXT DEFAULT 0;
+
+-- Declare a cursor for iterating through rows
+DECLARE cur CURSOR FOR
+SELECT id, Sr_No, Lendingkart_Total_Interest_Receivable, Lendingkart_Share_One
+FROM tghapp
+ORDER BY id, Sr_No;
+
+-- Declare CONTINUE handler for cursor
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+-- Open the cursor
+OPEN cur;
+
+-- Loop through the rows
+read_loop: LOOP
+FETCH cur INTO v_id, v_sr_no, v_opening_balance, v_Lendingkart_Share_One;
+
+-- Exit the loop if done
+IF done THEN
+LEAVE read_loop;
+END IF;
+
+-- Check if id has changed and Sr_No is 1
+IF v_id != prev_id AND v_sr_no = 1 THEN
+-- Set Opening_Balance to Loan_Disbursement
+SET v_opening_balance = (SELECT Lendingkart_Total_Interest_Receivable FROM tghapp WHERE id = v_id AND Sr_No = 1);
+ELSE
+-- Use Closing_Balance from the previous row
+SET v_opening_balance = (
+SELECT Closing_Balance_Of_Lendingkart_Int_O_S
+FROM tghapp
+WHERE id = prev_id AND Sr_No = (v_sr_no - 1)
+);
+END IF;
+
+-- Calculate Closing_Balance
+SET v_closing_balance = v_opening_balance - v_Lendingkart_Share_One;
+
+-- Update the table with the calculated balances
+UPDATE tghapp
+SET Opening_Balance_of_Lendingkart_Interest_O_S = v_opening_balance,
+Closing_Balance_Of_Lendingkart_Int_O_S = v_closing_balance
+WHERE id = v_id AND Sr_No = v_sr_no;
+
+-- Set the previous ID to the current ID
+SET prev_id = v_id;
+END LOOP;
+
+-- Close the cursor
+CLOSE cur;
+END
+
+------end copy---
+
+
+------partner share--------copy from here --------
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Calculate_Partner_share_One_2`()
+BEGIN
+DECLARE v_id TEXT DEFAULT 0;
+DECLARE v_sr_no TEXT;
+DECLARE v_opening_balance TEXT;
+DECLARE v_Lendingkart_Share_One TEXT;
+DECLARE v_closing_balance TEXT;
+DECLARE prev_id TEXT DEFAULT 0;
+DECLARE done TEXT DEFAULT 0;
+
+-- Declare a cursor for iterating through rows
+DECLARE cur CURSOR FOR
+SELECT id, Sr_No, Partner_Total_Interest_Receivable, Lendingkart_Share_One
+FROM tghapp
+ORDER BY id, Sr_No;
+
+-- Declare CONTINUE handler for cursor
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+-- Open the cursor
+OPEN cur;
+
+-- Loop through the rows
+read_loop: LOOP
+FETCH cur INTO v_id, v_sr_no, v_opening_balance, v_Lendingkart_Share_One;
+
+-- Exit the loop if done
+IF done THEN
+LEAVE read_loop;
+END IF;
+
+-- Check if id has changed and Sr_No is 1
+IF v_id != prev_id AND v_sr_no = 1 THEN
+-- Set Opening_Balance to Loan_Disbursement
+SET v_opening_balance = (SELECT Partner_Total_Interest_Receivable FROM tghapp WHERE id = v_id AND Sr_No = 1);
+ELSE
+-- Use Closing_Balance from the previous row
+SET v_opening_balance = (
+SELECT Closing_Balance_Of_Partner_Int_O_S
+FROM tghapp
+WHERE id = prev_id AND Sr_No = (v_sr_no - 1)
+);
+END IF;
+
+-- Calculate Closing_Balance
+SET v_closing_balance = v_opening_balance - v_Lendingkart_Share_One;
+
+-- Update the table with the calculated balances
+UPDATE tghapp
+SET Opening_Balance_Of_Partner_Interest_O_S = v_opening_balance,
+Closing_Balance_Of_Partner_Int_O_S = v_closing_balance
+WHERE id = v_id AND Sr_No = v_sr_no;
+
+-- Set the previous ID to the current ID
+SET prev_id = v_id;
+END LOOP;
+
+-- Close the cursor
+CLOSE cur;
+END
+
+
+------end copy------
+
+
+
+
+
+------Triggers--------
+-----copy trigger and run it and mention your database and table name in itDELIMITER //
+
+
+----Bounce_Charges_Receivable-----Penal_Charges_Receivable
+CREATE TRIGGER update_charges_receivable
+BEFORE UPDATE ON tghapp
+FOR EACH ROW
+BEGIN
+    -- Update Bounce_Charges_Receivable
+    IF NEW.Bounce_Charges_Received IS NOT NULL THEN
+        SET NEW.Bounce_Charges_Receivable = NEW.Bounce_Charges_Received;
+    END IF;
+
+    -- Update Penal_Charges_Receivable
+    IF NEW.Penal_Charges_Received IS NOT NULL THEN
+        SET NEW.Penal_Charges_Receivable = NEW.Penal_Charges_Received;
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+-------end---------
+
+---EMI_Receivable_As_Per_Repayment_Schedule
+
+CREATE TRIGGER update_EMI_Receivable_As_Per_Repayment_Schedule BEFORE UPDATE ON tghapp
+FOR EACH ROW
+SET NEW.EMI_Receivable_As_Per_Repayment_Schedule = (NEW.Principal_Receivable_As_per_Repayment_Schedule + NEW.Lendingkart_Int_Receivale_As_Per_Repayment_Schedule + NEW.Partner_Int_Receivale_As_Per_Repayment_Schedule);
+
+--Total_Received
+
+CREATE TRIGGER update_Total_Received BEFORE UPDATE ON tghapp
+FOR EACH ROW
+SET NEW.Total_Received = (NEW.EMI_Amount_Received + NEW.Advance_Received);
+
+--EMI_Amount_Received
+
+CREATE TRIGGER update_EMI_Amount_Received BEFORE UPDATE ON tghapp
+FOR EACH ROW
+SET NEW.EMI_Amount_Received = (NEW.Principal_Received + NEW.Total_Interest_Received);
