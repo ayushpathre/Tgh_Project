@@ -759,9 +759,9 @@ public class ExcelApp {
                 
                 if (conn != null) {
                     // Call stored procedures
-                    callStoredProcedure(conn, "CalculatePrincipalBalances");
-                    callStoredProcedure(conn, "Calculate_Partner_share_One_2");
-                    callStoredProcedure(conn, "Calculate_Lendingkart_Share_One_1");
+//                    callStoredProcedure(conn, "CalculatePrincipalBalances");
+//                    callStoredProcedure(conn, "Calculate_Partner_share_One_2");
+//                    callStoredProcedure(conn, "Calculate_Lendingkart_Share_One_1");
                     callStoredProcedureWithParameter(conn, "excel_import.update_emi_no", formattedDate);
                     callStoredProcedure(conn, "update_DPD");
 
